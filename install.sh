@@ -140,7 +140,7 @@ EOF
 
 # Update docker-compose.yml with domain if provided
 if [ -n "$DOMAIN" ]; then
-    sed -i "s/server_name _;/server_name $DOMAIN;/" "$INSTALL_DIR/nginx/nginx.conf"
+    sed -i "s/server_name _;/server_name $DOMAIN;/g" "$INSTALL_DIR/nginx/nginx.conf"
 fi
 
 echo "[5/6] Setting up SSL..."
@@ -183,11 +183,12 @@ echo "=============================="
 echo ""
 docker-compose ps
 echo ""
-echo "Commands:"
+echo "Management Commands:"
+echo "  Menu:      sudo python3 speedit.py manage"
 echo "  Logs:      cd $INSTALL_DIR && docker-compose logs -f"
 echo "  Restart:   cd $INSTALL_DIR && docker-compose restart"
 echo "  Stop:      cd $INSTALL_DIR && docker-compose stop"
-echo "  Uninstall: cd $INSTALL_DIR && docker-compose down -v && rm -rf $INSTALL_DIR"
+echo "  Uninstall: sudo python3 speedit.py uninstall"
 echo ""
 if [ -n "$DOMAIN" ]; then
     echo "URLs:"
