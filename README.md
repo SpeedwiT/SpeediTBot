@@ -11,107 +11,18 @@
 
 **Advanced Telegram Bot + Mini App for managing VPN panels with full sales automation**
 
-[🇮🇷 Persian (فارسی)](#--persian-فارسی) | [🇬🇧 English](#--english)
-
 </div>
 
 ---
 
-## 🇮🇷 Persian (فارسی)
-
-### نصب سریع (یک دقیقه‌ای)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/SpeedwiT/SpeediTBot/main/install.sh | bash
-```
-
-### منوی مدیریت ربات
-
-بعد از نصب، با این دستور منوی مدیریت باز میشه:
-
-```bash
-sudo python3 speedit.py manage
-```
-
-توی این منو می‌تونی:
-- 📊 وضعیت ربات رو ببینی (Container health, RAM, Disk)
-- 📜 لاگ‌ها رو ببینی (Bot, API, Database, Redis, Nginx)
-- 🔄 ربات رو ری‌استارت کنی
-- ⏹️ ربات رو متوقف کنی
-- ▶️ ربات رو استارت بدی
-- ⬆️ ربات رو آپدیت کنی (آخرین نسخه از GitHub)
-- 💾 بکاپ بگیری
-- ♻️ از بکاپ ریستور کنی
-- 🗑️ ربات رو کامل حذف کنی
-
-### دستورات ربات
-
-| دستور | توضیحات |
-|-------|---------|
-| `/start` | منوی اصلی |
-| `/admin` | پنل مدیریت |
-| `/help` | راهنما |
-| `/support` | پشتیبانی |
-
-### ارتباط با ما
-- **پشتیبانی:** [@SpeedwIT](https://t.me/SpeedwIT)
-- **کانال:** [@Speedw_IT](https://t.me/Speedw_IT)
-
----
- 
-## 🇬🇧 English
-
-### Quick Install (One Minute)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/SpeedwiT/SpeediTBot/main/install.sh | bash
-```
-
-During installation you'll be asked for:
-- **Bot Token** - From @BotFather
-- **Admin ID** - Your Telegram user ID
-- **Domain** - Optional (for SSL + webhook, leave empty for polling mode)
-- **Email** - For SSL certificate (only if you entered a domain)
-
-### Bot Management Menu
-
-After installation, open the management menu:
-
-```bash
-sudo python3 speedit.py manage
-```
-
-In this menu you can:
-- 📊 **Check Status** - View container health, RAM, disk usage, and public IP
-- 📜 **View Logs** - Live logs for all services (Bot, API, Database, Redis, Nginx)
-- 🔄 **Restart** - Restart all services
-- ⏹️ **Stop** - Stop all services
-- ▶️ **Start** - Start all services
-- ⏫ **Update** - Pull latest version from GitHub and rebuild
-- 💾 **Backup** - Create a full backup of bot, database, and configs
-- ♻️ **Restore** - Restore from a previous backup
-- 🗑️ **Uninstall** - Completely remove SpeediT
-
-### Telegram Bot Commands
-
-| Command | Description |
-|---------|-------------|
-| `/start` | Main menu |
-| `/admin` | Admin panel |
-| `/help` | Help |
-| `/support` | Support contact |
+## 🇮🇷 [فارسی](https://github.com/SpeedwiT/SpeediTBot/blob/main/docs/README_fa.md)
 
 ---
 
-## 📸 Preview
+## 🚀 Quick Install
 
-```
-   ███████╗██████╗ ███████╗███████╗██████╗ ██╗████████╗
-   ██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗██║╚══██╔══╝
-   ███████╗██████╔╝█████╗  █████╗  ██║  ██║██║   ██║   
-   ╚════██║██╔═══╝ ██╔══╝  ██╔══╝  ██║  ██║██║   ██║   
-   ███████║██║     ███████╗███████╗██████╔╝██║   ██║   
-   ╚══════╝╚═╝     ╚══════╝╚══════╝╚═════╝ ╚═╝   ╚═╝   
+```bash
+curl -fsSL https://raw.githubusercontent.com/SpeedwiT/SpeediTBot/main/install.sh | bash
 ```
 
 ---
@@ -144,7 +55,28 @@ In this menu you can:
 
 ---
 
+## 🛠️ Management Menu
+
+```bash
+sudo python3 speedit.py speed
+```
+
+| Option | Description |
+|--------|-------------|
+| 📊 Check Status | Container health, RAM, disk, network |
+| 📜 View Logs | Live logs for all services |
+| 🔄 Restart | Restart all services |
+| ⏹️ Stop | Stop all services |
+| ▶️ Start | Start all services |
+| ⬆️ Update | Pull latest from GitHub and rebuild |
+| 💾 Backup | Full backup of bot, DB, configs |
+| ♻️ Restore | Restore from backup |
+| 🗑️ Uninstall | Complete removal |
+
+---
+
 ## 📋 Requirements
+
 - Ubuntu 20.04+ / Debian 11+
 - 2GB RAM (minimum)
 - 20GB Disk
@@ -187,9 +119,21 @@ speedit/
 ---
 
 ## 💳 Supported Payment Methods
+
 - Card-to-Card (manual with admin approval)
 - Crypto (NowPayments, Plisio)
 - Online gateways (Zarinpal, Aqayepardakht, IranPay)
+
+---
+
+## 📱 Telegram Bot Commands
+
+| Command | Description |
+|---------|-------------|
+| `/start` | Main menu |
+| `/admin` | Admin panel |
+| `/help` | Help |
+| `/support` | Support contact |
 
 ---
 

@@ -5,12 +5,9 @@ Advanced Terminal UI with full installation and management capabilities
 
 Usage:
     sudo python3 speedit.py install     - Install SpeediT
-    sudo python3 speedit.py manage      - Open management menu
+    sudo python3 speedit.py speed       - Open management menu
     sudo python3 speedit.py update      - Update to latest version
     sudo python3 speedit.py uninstall   - Remove SpeediT completely
-
-Telegram Bot Commands:
-    /speed - Open management menu (admin only)
 """
 
 import os
@@ -41,7 +38,7 @@ class Colors:
 # ============== Configuration ==============
 
 PROJECT_NAME = "SpeediT"
-PROJECT_VERSION = "1.0.0"
+PROJECT_VERSION = "1.0.4"
 PROJECT_DESC = "Telegram Bot for VPN Panel Management"
 SUPPORT_TG = "@SpeedwIT"
 CHANNEL_TG = "@Speedw_IT"
@@ -298,7 +295,6 @@ def setup_ssl(config):
     if not shutil.which("certbot"):
         run_cmd("apt-get install -y -qq certbot python3-certbot-nginx", "Installing Certbot")
     
-    # Stop any service on port 80
     run_cmd("systemctl stop nginx 2>/dev/null || true", "Stopping nginx")
     
     domain = config['domain']
@@ -348,7 +344,7 @@ def show_post_install(config):
     
     print(f"  {Colors.BOLD}Useful Commands:{Colors.RESET}")
     print(f"  {Colors.DIM}─────────────────────────────────────────────{Colors.RESET}")
-    print(f"  {Colors.CYAN}Manage:{Colors.RESET}    sudo python3 speedit.py manage")
+    print(f"  {Colors.CYAN}Menu:{Colors.RESET}      sudo python3 speedit.py speed")
     print(f"  {Colors.CYAN}Logs:{Colors.RESET}      cd {INSTALL_DIR} && docker-compose logs -f")
     print(f"  {Colors.CYAN}Restart:{Colors.RESET}   cd {INSTALL_DIR} && docker-compose restart")
     print(f"  {Colors.CYAN}Update:{Colors.RESET}    sudo python3 speedit.py update")
@@ -526,23 +522,18 @@ def update_bot():
     print(f"{Colors.BOLD}{Colors.WHITE}  Update SpeediT{Colors.RESET}")
     print(f"{Colors.CYAN}{'═' * 55}{Colors.RESET}\n")
     
-    # Check if installed
     if not os.path.exists(INSTALL_DIR):
         print(f"{Colors.RED}✗ SpeediT is not installed!{Colors.RESET}")
         time.sleep(2)
         return
     
-    # Get latest version info
     print(f"  {Colors.DIM}Checking for updates...{Colors.RESET}")
     result = subprocess.run("curl -s https://api.github.com/repos/SpeedwiT/SpeediTBot/releases/latest 2>/dev/null | grep tag_name | cut -d'\"' -f4", shell=True, capture_output=True, text=True)
     latest_version = result.stdout.strip() if result.stdout.strip() else "unknown"
     print(f"  {Colors.BOLD}Latest version:{Colors.RESET} {Colors.CYAN}{latest_version}{Colors.RESET}")
     print(f"  {Colors.BOLD}Current version:{Colors.RESET} {Colors.CYAN}{PROJECT_VERSION}{Colors.RESET}\n")
     
-    # Pull changes
     run_cmd(f"cd {INSTALL_DIR} && git pull 2>/dev/null || echo 'Not a git repo'", "Pulling latest changes")
-    
-    # Rebuild and restart
     run_cmd(f"cd {INSTALL_DIR} && docker-compose build --no-cache", "Rebuilding images", timeout=300)
     run_cmd(f"cd {INSTALL_DIR} && docker-compose up -d", "Restarting services")
     
@@ -611,8 +602,8 @@ def uninstall():
         print(f"\n{Colors.YELLOW}Uninstall cancelled{Colors.RESET}")
         time.sleep(2)
 
-def manage():
-    """Management menu"""
+def speed():
+    """Management menu - open with: sudo python3 speedit.py speed"""
     while True:
         clear_screen()
         print_header()
@@ -680,15 +671,15 @@ def main():
         command = sys.argv[1].lower()
         if command == "install":
             install()
-        elif command == "manage":
-            manage()
+        elif command == "speed":
+            speed()
         elif command == "update":
             update_bot()
         elif command == "uninstall":
             uninstall()
         else:
             print(f"Unknown command: {command}")
-            print(f"Usage: sudo python3 speedit.py [install|manage|update|uninstall]")
+            print(f"Usage: sudo python3 speedit.py [install|speed|update|uninstall]")
         return
     
     while True:
@@ -708,7 +699,7 @@ def main():
         if choice == "1":
             install()
         elif choice == "2":
-            manage()
+            speed()
         elif choice == "3":
             update_bot()
         elif choice == "4":
