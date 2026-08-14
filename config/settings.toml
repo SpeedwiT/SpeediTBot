@@ -1,15 +1,15 @@
 [bot]
 token = "YOUR_BOT_TOKEN"
-admin_ids = [123456789, 987654321]
+admin_ids = [123456789]
 webhook_url = ""
 use_polling = true
 
 [database]
 host = "db"
 port = 5432
-name = "proxyman"
-user = "proxyman"
-password = "proxyman_secret"
+name = "speedit"
+user = "speedit"
+password = "speedit_secret"
 
 [redis]
 host = "redis"
