@@ -8,7 +8,7 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-from config.settings import settings
+from config import settings
 from database.db import init_db, get_session
 from bot.handlers import (
     admin_handler, product_handler, payment_handler,
