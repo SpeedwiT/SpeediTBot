@@ -67,7 +67,7 @@ echo "[3/6] Getting configuration..."
 
 # Get bot token
 while true; do
-    read -p "Enter Bot Token: " BOT_TOKEN
+    read -p "Enter Bot Token: " BOT_TOKEN < /dev/tty
     if [ ${#BOT_TOKEN} -gt 20 ] && [[ "$BOT_TOKEN" == *":"* ]]; then
         break
     fi
@@ -76,7 +76,7 @@ done
 
 # Get admin ID
 while true; do
-    read -p "Enter Admin ID (numeric): " ADMIN_ID
+    read -p "Enter Admin ID (numeric): " ADMIN_ID < /dev/tty
     if [[ "$ADMIN_ID" =~ ^[0-9]+$ ]] && [ ${#ADMIN_ID} -gt 5 ]; then
         break
     fi
@@ -84,11 +84,11 @@ while true; do
 done
 
 # Get domain (optional)
-read -p "Enter Domain (optional, press Enter to skip): " DOMAIN
+read -p "Enter Domain (optional, press Enter to skip): " DOMAIN < /dev/tty
 
 EMAIL=""
 if [ -n "$DOMAIN" ]; then
-    read -p "Enter Email (for SSL): " EMAIL
+    read -p "Enter Email (for SSL): " EMAIL < /dev/tty
 fi
 
 echo "[4/6] Downloading SpeediT..."
