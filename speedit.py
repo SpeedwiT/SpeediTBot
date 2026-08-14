@@ -276,12 +276,36 @@ def setup_ssl(config):
     if not shutil.which("certbot"):
         run_cmd("apt-get install -y certbot python3-certbot-nginx", "Installing Certbot")
     
-    run_cmd(f'certbot certonly --standalone --non-interactive --agree-tos --email {config["email"]} -d {config["domain"]}', "Obtaining SSL certificate")
+    # Create webroot directory
+    run_cmd("mkdir -p /var/www/html", "Creating webroot directory")
     
-    ssl_dir = f"{INSTALL_DIR}/nginx/ssl"
-    os.makedirs(ssl_dir, exist_ok=True)
-    run_cmd(f"cp /etc/letsencrypt/live/{config['domain']}/fullchain.pem {ssl_dir}/", "Copying SSL certificates")
-    run_cmd(f"cp /etc/letsencrypt/live/{config['domain']}/privkey.pem {ssl_dir}/", "Copying SSL key")
+    # Use webroot mode (works even if nginx is running)
+    domain = config['domain']
+    email = config['email']
+    
+    cmd = f'certbot certonly --webroot -w /var/www/html -d {domain} --email {email} --agree-tos --non-interactive'
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    
+    if result.returncode == 0:
+        print(f"  {Colors.GREEN}✓ SSL certificate obtained{Colors.RESET}")
+        
+        ssl_dir = f"{INSTALL_DIR}/nginx/ssl"
+        os.makedirs(ssl_dir, exist_ok=True)
+        
+        subdomain_dir = domain.split('.')[0] if '.' in domain else domain
+        possible_paths = [
+            f"/etc/letsencrypt/live/{domain}",
+            f"/etc/letsencrypt/live/{subdomain_dir}.{'.'.join(domain.split('.')[1:])}" if '.' in domain else "",
+        ]
+        
+        for cert_path in possible_paths:
+            if os.path.exists(cert_path) and cert_path:
+                run_cmd(f"cp {cert_path}/fullchain.pem {ssl_dir}/", "Copying SSL certificate")
+                run_cmd(f"cp {cert_path}/privkey.pem {ssl_dir}/", "Copying SSL key")
+                break
+    else:
+        print(f"  {Colors.YELLOW}⚠ SSL setup failed: {result.stderr[:100]}{Colors.RESET}")
+        print(f"  {Colors.DIM}  Continuing without SSL{Colors.RESET}")
 
 def deploy():
     print(f"\n{Colors.CYAN}{'═' * 55}{Colors.RESET}")
@@ -340,9 +364,40 @@ def install():
     
     config = get_bot_config()
     generate_env(config)
+    download_project()
     setup_ssl(config)
     deploy()
     show_post_install(config)
+
+def download_project():
+    """Copy project files to install directory"""
+    print(f"\n{Colors.CYAN}Copying project files...{Colors.RESET}\n")
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    items_to_copy = [
+        "bot", "api", "webapp", "database", "config", "scripts",
+        "nginx", "docker-compose.yml", "Dockerfile.bot", "Dockerfile.api",
+        "requirements-bot.txt", "requirements-api.txt"
+    ]
+    
+    os.makedirs(INSTALL_DIR, exist_ok=True)
+    
+    for item in items_to_copy:
+        src = os.path.join(script_dir, item)
+        dst = os.path.join(INSTALL_DIR, item)
+        if os.path.exists(src):
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src, dst)
+            print(f"  {Colors.GREEN}✓{Colors.RESET} Copied {item}")
+        else:
+            print(f"  {Colors.YELLOW}⚠{Colors.RESET} Skipped {item} (not found)")
+    
+    os.makedirs(f"{INSTALL_DIR}/nginx/ssl", exist_ok=True)
+    os.makedirs(f"{INSTALL_DIR}/backups", exist_ok=True)
+    
+    print(f"\n  {Colors.GREEN}✓ Project files ready{Colors.RESET}")
 
 def check_status():
     print(f"\n{Colors.CYAN}{'═' * 55}{Colors.RESET}")
