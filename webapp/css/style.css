@@ -1,0 +1,489 @@
+/* ProxiMan Mini App - Stylesheet */
+
+:root {
+    --primary: #3498db;
+    --primary-dark: #2980b9;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --dark: #2c3e50;
+    --light: #ecf0f1;
+    --gray: #95a5a6;
+    --white: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+.app-container {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--white);
+    min-height: 100vh;
+    box-shadow: var(--shadow);
+}
+
+/* Header */
+.app-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    padding: 20px;
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    font-size: 28px;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.user-balance {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.balance-amount {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Sections */
+.section {
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: var(--dark);
+}
+
+/* Categories */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.category-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 20px;
+    border-radius: var(--radius);
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+    border-color: var(--primary);
+}
+
+.category-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.category-name {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Products */
+.products-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.product-card {
+    background: var(--white);
+    border: 2px solid var(--light);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.product-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow);
+}
+
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--success);
+}
+
+.product-features {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--gray);
+}
+
+.product-features span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray);
+}
+
+.modal-close:hover {
+    color: var(--danger);
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--light);
+}
+
+.modal-header h3 {
+    font-size: 20px;
+}
+
+/* Product Info in Modal */
+.product-info {
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--light);
+}
+
+.info-label {
+    color: var(--gray);
+}
+
+.info-value {
+    font-weight: bold;
+}
+
+.info-value.price {
+    color: var(--success);
+    font-size: 18px;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.btn-secondary {
+    background: var(--light);
+    color: var(--dark);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline:hover, .btn-outline.active {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.btn-copy {
+    background: var(--gray);
+    color: var(--white);
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.modal-actions .btn {
+    flex: 1;
+}
+
+/* Payment Methods */
+.payment-methods {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.payment-method {
+    flex: 1;
+    padding: 12px;
+    font-size: 14px;
+}
+
+/* Bank Cards */
+.bank-cards {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.bank-card {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: var(--white);
+    padding: 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.bank-card:hover {
+    transform: scale(1.02);
+}
+
+.bank-card-number {
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.bank-card-holder {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Card Info */
+.card-info {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.card-image-container img {
+    max-width: 100%;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.card-details {
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+/* Receipt Upload */
+.receipt-upload {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.upload-label {
+    display: block;
+    padding: 20px;
+    border: 2px dashed var(--gray);
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: var(--transition);
+}
+
+.upload-label:hover {
+    border-color: var(--primary);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+#receipt-input {
+    display: none;
+}
+
+/* Success Modal */
+.success-content {
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.success-content h3 {
+    color: var(--success);
+    margin-bottom: 8px;
+}
+
+.subscription-box {
+    margin: 20px 0;
+    text-align: right;
+}
+
+.subscription-box label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--light);
+    border-radius: var(--radius);
+    font-size: 14px;
+    direction: ltr;
+}
+
+.qr-container {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.qr-container img {
+    max-width: 200px;
+}
+
+/* Footer */
+.app-footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--gray);
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .product-features {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .payment-methods {
+        flex-direction: column;
+    }
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.btn-primary:hover {
+    animation: pulse 1s infinite;
+}

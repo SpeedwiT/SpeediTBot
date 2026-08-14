@@ -1,0 +1,51 @@
+# ProxiMan - Ignore files
+
+# Environment
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# SSL
+nginx/ssl/*.pem
+nginx/ssl/*.key
+
+# Logs
+logs/
+*.log
+
+# Temp
+temp/
+tmp/
+
+# Database
+*.db
+*.sqlite3

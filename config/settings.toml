@@ -1,0 +1,22 @@
+[bot]
+token = "YOUR_BOT_TOKEN"
+admin_ids = [123456789, 987654321]
+webhook_url = ""
+use_polling = true
+
+[database]
+host = "db"
+port = 5432
+name = "proxyman"
+user = "proxyman"
+password = "proxyman_secret"
+
+[redis]
+host = "redis"
+port = 6379
+db = 0
+
+[app]
+debug = false
+secret_key = "your-super-secret-key-change-this"
+log_level = "INFO"

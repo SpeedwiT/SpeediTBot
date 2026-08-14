@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProxiMan - خرید کانفیگ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🛡️</span>
+                    <span class="logo-text">ProxiMan</span>
+                </div>
+                <div class="user-balance">
+                    <span class="balance-label">موجودی:</span>
+                    <span class="balance-amount" id="user-balance">0</span>
+                    <span class="currency">تومان</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Categories -->
+        <section class="section categories-section">
+            <h2 class="section-title">📂 دسته‌بندی‌ها</h2>
+            <div class="categories-grid" id="categories-list">
+                <!-- Categories loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Products -->
+        <section class="section products-section">
+            <h2 class="section-title">🛍️ محصولات</h2>
+            <div class="products-grid" id="products-list">
+                <!-- Products loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Selected Product Modal -->
+        <div class="modal" id="product-modal">
+            <div class="modal-content">
+                <span class="modal-close" id="modal-close">&times;</span>
+                <div class="modal-header">
+                    <h3 id="modal-title">نام محصول</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="product-info">
+                        <div class="info-row">
+                            <span class="info-label">📅 مدت:</span>
+                            <span class="info-value" id="modal-duration">۳۰ روز</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">📊 حجم:</span>
+                            <span class="info-value" id="modal-traffic">۵۰ گیگ</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">👥 اتصال:</span>
+                            <span class="info-value" id="modal-connections">۲ کاربر</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">💰 قیمت:</span>
+                            <span class="info-value price" id="modal-price">۱۵۰,۰۰۰</span>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" id="btn-buy">
+                            🛒 خرید
+                        </button>
+                        <button class="btn btn-secondary" id="btn-close">
+                            بستن
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase Modal -->
+        <div class="modal" id="purchase-modal">
+            <div class="modal-content">
+                <span class="modal-close" id="purchase-close">&times;</span>
+                <div class="modal-header">
+                    <h3>💳 پرداخت</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="payment-methods">
+                        <button class="btn btn-outline payment-method active" data-method="card">
+                            💳 کارت به کارت
+                        </button>
+                        <button class="btn btn-outline payment-method" data-method="balance">
+                            💰 از موجودی
+                        </button>
+                    </div>
+                    <div class="bank-cards" id="bank-cards-list">
+                        <!-- Bank cards loaded dynamically -->
+                    </div>
+                    <div class="card-info" id="card-info" style="display: none;">
+                        <div class="card-image-container">
+                            <img id="card-image" src="" alt="کارت بانکی">
+                        </div>
+                        <div class="card-details" id="card-details"></div>
+                    </div>
+                    <div class="receipt-upload" id="receipt-upload" style="display: none;">
+                        <label for="receipt-input" class="upload-label">
+                            📷 آپلود فیش واریزی
+                        </label>
+                        <input type="file" id="receipt-input" accept="image/*">
+                        <button class="btn btn-primary" id="btn-submit-receipt">
+                            ارسال فیش
+                        </button>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" id="btn-confirm-pay">
+                            ✅ تایید پرداخت
+                        </button>
+                        <button class="btn btn-secondary" id="btn-cancel-pay">
+                            انصراف
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Success Modal -->
+        <div class="modal" id="success-modal">
+            <div class="modal-content success-content">
+                <div class="success-icon">✅</div>
+                <h3>خرید موفق!</h3>
+                <p id="success-message">کانفیگ شما آماده است.</p>
+                <div class="subscription-box" id="subscription-box">
+                    <label>لینک سابسکریپشن:</label>
+                    <div class="input-group">
+                        <input type="text" id="sub-link" readonly>
+                        <button class="btn btn-copy" id="btn-copy">کپی</button>
+                    </div>
+                    <div class="qr-container" id="qr-container"></div>
+                </div>
+                <button class="btn btn-primary" id="btn-close-success">بستن</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© ۱۴۰۵ - ProxiMan</p>
+        </footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
