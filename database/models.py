@@ -7,11 +7,8 @@ from sqlalchemy import (
     Column, Integer, String, Float, Boolean, DateTime,
     Text, ForeignKey, Enum, BigInteger, JSON,
 )
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, relationship
 import enum
-
-from config.settings import settings
 
 
 class Base(DeclarativeBase):
@@ -252,22 +249,9 @@ class UserPreference(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
-# Database engine & session
-DATABASE_URL = (
-    f"postgresql+asyncpg://{settings.database.user}:{settings.database.password}"
-    f"@{settings.database.host}:{settings.database.port}/{settings.database.name}"
-)
-
-engine = create_async_engine(DATABASE_URL, echo=settings.app.debug)
-async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+# Database engine & session - از db.py import می‌شه
+from database.db import engine, async_session_maker
 
 
-async def init_db():
-    """ایجاد جداول دیتابیس"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-
-async def get_session() -> AsyncSession:
-    async with async_session_maker() as session:
-        yield session
+# init_db و get_session از db.py import می‌شن
+from database.db import init_db, get_session  # noqa: E402, F401

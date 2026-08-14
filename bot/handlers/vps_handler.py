@@ -7,6 +7,7 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
+from config import settings
 from database.db import get_session
 from database.models import VPSOrder, Order, OrderStatus, User
 from bot.utils.helpers import format_price

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import DeclarativeBase
 from typing import AsyncGenerator
 
-from config.settings import settings
+from config import settings
 
 
 class Base(DeclarativeBase):
@@ -44,7 +44,7 @@ async def init_db():
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    """دریافت سشن دیتابیس"""
+    """دریافت سشن دیتابیس - سازگار با FastAPI Depends"""
     async with async_session_maker() as session:
         try:
             yield session

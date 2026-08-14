@@ -2,6 +2,15 @@
 """
 SpeediT - Telegram Bot Manager for VPN Panel Management
 Advanced Terminal UI with full installation and management capabilities
+
+Usage:
+    sudo python3 speedit.py install     - Install SpeediT
+    sudo python3 speedit.py manage      - Open management menu
+    sudo python3 speedit.py update      - Update to latest version
+    sudo python3 speedit.py uninstall   - Remove SpeediT completely
+
+Telegram Bot Commands:
+    /speed - Open management menu (admin only)
 """
 
 import os
@@ -37,8 +46,10 @@ PROJECT_DESC = "Telegram Bot for VPN Panel Management"
 SUPPORT_TG = "@SpeedwIT"
 CHANNEL_TG = "@Speedw_IT"
 GITHUB_URL = "https://github.com/SpeedwiT/SpeediTBot"
+GITHUB_REPO = "SpeedwiT/SpeediTBot"
 INSTALL_DIR = "/opt/speedit"
 ENV_FILE = f"{INSTALL_DIR}/.env"
+CONFIG_FILE = f"{INSTALL_DIR}/.speedit_config.json"
 
 # ============== UI Components ==============
 
@@ -64,8 +75,8 @@ def status_dot(status):
 
 def progress_bar(percent, width=40):
     filled = int(width * percent / 100)
-    bar = "#" * filled + "-" * (width - filled)
-    return f"[{bar}] {percent:.0f}%"
+    bar = "█" * filled + "░" * (width - filled)
+    return f"[{bar}] {percent:.1f}%"
 
 def print_header():
     banner = f"""
@@ -118,18 +129,29 @@ def confirm_action(message):
     print(f"\n{Colors.RED}{Colors.BOLD}⚠ {message}{Colors.RESET}")
     return input(f"{Colors.YELLOW}Type 'yes' to confirm:{Colors.RESET} ").strip().lower() == 'yes'
 
-def run_cmd(cmd, desc=""):
+def run_cmd(cmd, desc="", timeout=None):
     """Run shell command with status"""
     if desc:
         print(f"  {Colors.DIM}{desc}...{Colors.RESET}", end="", flush=True)
-    result = subprocess.run(cmd, shell=True, capture_output=True)
-    if result.returncode == 0:
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        if result.returncode == 0:
+            if desc:
+                print(f"\r  {Colors.GREEN}✓ {desc}{Colors.RESET}")
+            return True
+        else:
+            if desc:
+                print(f"\r  {Colors.RED}✗ {desc}{Colors.RESET}")
+            if result.stderr:
+                print(f"    {Colors.DIM}{result.stderr[:200]}{Colors.RESET}")
+            return False
+    except subprocess.TimeoutExpired:
         if desc:
-            print(f"\r  {Colors.GREEN}✓ {desc}{Colors.RESET}")
-        return True
-    else:
+            print(f"\r  {Colors.YELLOW}⏱ {desc} (timeout){Colors.RESET}")
+        return False
+    except Exception as e:
         if desc:
-            print(f"\r  {Colors.RED}✗ {desc}{Colors.RESET}")
+            print(f"\r  {Colors.RED}✗ {desc} ({e}){Colors.RESET}")
         return False
 
 # ============== Main Functions ==============
@@ -159,7 +181,7 @@ def check_requirements():
     try:
         with open("/proc/meminfo") as f:
             mem_total = int(f.readline().split()[1]) / 1024 / 1024
-            status = "ok" if mem_total >= 1.0 else "warning"
+            status = "ok" if mem_total >= 1.5 else "warning"
             print(f"  {status_dot(status)} {Colors.GREEN if status == 'ok' else Colors.YELLOW}{'RAM':<20}{Colors.RESET} {mem_total:.1f} GB")
     except:
         pass
@@ -176,15 +198,15 @@ def check_requirements():
 def install_requirements():
     print(f"\n{Colors.CYAN}Installing requirements...{Colors.RESET}\n")
     
-    run_cmd("apt-get update", "Updating package list")
-    run_cmd("apt-get install -y curl wget git software-properties-common apt-transport-https ca-certificates", "Installing basic tools")
+    run_cmd("apt-get update -qq", "Updating package list")
+    run_cmd("apt-get install -y -qq curl wget git software-properties-common apt-transport-https ca-certificates", "Installing basic tools")
     
     if not shutil.which("docker"):
-        run_cmd("curl -fsSL https://get.docker.com | sh", "Installing Docker")
+        run_cmd("curl -fsSL https://get.docker.com | sh", "Installing Docker", timeout=120)
         run_cmd("systemctl enable docker && systemctl start docker", "Enabling Docker")
     
     if not shutil.which("docker-compose"):
-        run_cmd('pip3 install docker-compose 2>/dev/null || (curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose)', "Installing Docker Compose")
+        run_cmd('pip3 install docker-compose 2>/dev/null || (curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose)', "Installing Docker Compose", timeout=60)
     
     print(f"\n{Colors.GREEN}{Colors.BOLD}✓ All requirements installed!{Colors.RESET}")
 
@@ -263,7 +285,7 @@ LOG_LEVEL=INFO
     
     print(f"  {Colors.GREEN}✓ Configuration saved to {ENV_FILE}{Colors.RESET}")
     
-    with open(f"{INSTALL_DIR}/.speedit_config.json", "w") as f:
+    with open(CONFIG_FILE, "w") as f:
         json.dump(config, f, indent=2)
 
 def setup_ssl(config):
@@ -274,16 +296,15 @@ def setup_ssl(config):
     print(f"\n{Colors.CYAN}Setting up SSL certificate...{Colors.RESET}\n")
     
     if not shutil.which("certbot"):
-        run_cmd("apt-get install -y certbot python3-certbot-nginx", "Installing Certbot")
+        run_cmd("apt-get install -y -qq certbot python3-certbot-nginx", "Installing Certbot")
     
-    # Create webroot directory
-    run_cmd("mkdir -p /var/www/html", "Creating webroot directory")
+    # Stop any service on port 80
+    run_cmd("systemctl stop nginx 2>/dev/null || true", "Stopping nginx")
     
-    # Use webroot mode (works even if nginx is running)
     domain = config['domain']
     email = config['email']
     
-    cmd = f'certbot certonly --webroot -w /var/www/html -d {domain} --email {email} --agree-tos --non-interactive'
+    cmd = f'certbot certonly --standalone --non-interactive --agree-tos --email {email} -d {domain}'
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     
     if result.returncode == 0:
@@ -292,17 +313,9 @@ def setup_ssl(config):
         ssl_dir = f"{INSTALL_DIR}/nginx/ssl"
         os.makedirs(ssl_dir, exist_ok=True)
         
-        subdomain_dir = domain.split('.')[0] if '.' in domain else domain
-        possible_paths = [
-            f"/etc/letsencrypt/live/{domain}",
-            f"/etc/letsencrypt/live/{subdomain_dir}.{'.'.join(domain.split('.')[1:])}" if '.' in domain else "",
-        ]
-        
-        for cert_path in possible_paths:
-            if os.path.exists(cert_path) and cert_path:
-                run_cmd(f"cp {cert_path}/fullchain.pem {ssl_dir}/", "Copying SSL certificate")
-                run_cmd(f"cp {cert_path}/privkey.pem {ssl_dir}/", "Copying SSL key")
-                break
+        if os.path.exists(f"/etc/letsencrypt/live/{domain}"):
+            run_cmd(f"cp /etc/letsencrypt/live/{domain}/fullchain.pem {ssl_dir}/", "Copying SSL certificate")
+            run_cmd(f"cp /etc/letsencrypt/live/{domain}/privkey.pem {ssl_dir}/", "Copying SSL key")
     else:
         print(f"  {Colors.YELLOW}⚠ SSL setup failed: {result.stderr[:100]}{Colors.RESET}")
         print(f"  {Colors.DIM}  Continuing without SSL{Colors.RESET}")
@@ -386,11 +399,14 @@ def download_project():
         src = os.path.join(script_dir, item)
         dst = os.path.join(INSTALL_DIR, item)
         if os.path.exists(src):
-            if os.path.isdir(src):
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-            else:
-                shutil.copy2(src, dst)
-            print(f"  {Colors.GREEN}✓{Colors.RESET} Copied {item}")
+            try:
+                if os.path.isdir(src):
+                    shutil.copytree(src, dst, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(src, dst)
+                print(f"  {Colors.GREEN}✓{Colors.RESET} Copied {item}")
+            except Exception as e:
+                print(f"  {Colors.RED}✗{Colors.RESET} Failed to copy {item}: {e}")
         else:
             print(f"  {Colors.YELLOW}⚠{Colors.RESET} Skipped {item} (not found)")
     
@@ -400,34 +416,94 @@ def download_project():
     print(f"\n  {Colors.GREEN}✓ Project files ready{Colors.RESET}")
 
 def check_status():
+    """Show detailed bot status"""
     print(f"\n{Colors.CYAN}{'═' * 55}{Colors.RESET}")
     print(f"{Colors.BOLD}{Colors.WHITE}  Bot Status{Colors.RESET}")
     print(f"{Colors.CYAN}{'═' * 55}{Colors.RESET}\n")
     
-    result = subprocess.run(f"cd {INSTALL_DIR} && docker-compose ps", shell=True, capture_output=True, text=True)
+    # Docker containers
     print(f"  {Colors.BOLD}Docker Containers:{Colors.RESET}")
     print(f"  {Colors.DIM}{'─' * 50}{Colors.RESET}")
-    
+    result = subprocess.run(f"cd {INSTALL_DIR} && docker-compose ps", shell=True, capture_output=True, text=True)
     if result.stdout:
         lines = result.stdout.strip().split('\n')
         for line in lines[2:] if len(lines) > 2 else lines:
             if line.strip():
-                print(f"  {status_dot('ok' if 'running' in line.lower() else 'error')} {line}")
+                status_key = 'ok' if 'up' in line.lower() and 'unhealthy' not in line.lower() else 'error'
+                print(f"  {status_dot(status_key)} {line}")
     
+    # Disk usage
     print(f"\n  {Colors.BOLD}Disk Usage:{Colors.RESET}")
-    stat = shutil.disk_usage(INSTALL_DIR)
-    used_gb = stat.used / 1024 / 1024 / 1024
-    total_gb = stat.total / 1024 / 1024 / 1024
-    percent = (stat.used / stat.total) * 100
-    print(f"  {progress_bar(percent, 30)}")
-    print(f"  {Colors.DIM}  {used_gb:.1f} GB / {total_gb:.1f} GB{Colors.RESET}")
+    try:
+        stat = shutil.disk_usage(INSTALL_DIR)
+        used_gb = stat.used / 1024 / 1024 / 1024
+        total_gb = stat.total / 1024 / 1024 / 1024
+        percent = (stat.used / stat.total) * 100
+        print(f"  {progress_bar(percent, 30)}")
+        print(f"  {Colors.DIM}  {used_gb:.1f} GB / {total_gb:.1f} GB{Colors.RESET}")
+    except:
+        pass
+    
+    # RAM usage
+    print(f"\n  {Colors.BOLD}Memory Usage:{Colors.RESET}")
+    try:
+        with open("/proc/meminfo") as f:
+            lines = f.readlines()
+            total = int(lines[0].split()[1]) / 1024 / 1024
+            available = int(lines[2].split()[1]) / 1024 / 1024
+            used = total - available
+            percent = (used / total) * 100
+            print(f"  {progress_bar(percent, 30)}")
+            print(f"  {Colors.DIM}  {used:.1f} GB / {total:.1f} GB{Colors.RESET}")
+    except:
+        pass
+    
+    # Network
+    print(f"\n  {Colors.BOLD}Network:{Colors.RESET}")
+    result = subprocess.run("curl -s ifconfig.me 2>/dev/null || echo 'N/A'", shell=True, capture_output=True, text=True)
+    if result.stdout.strip():
+        print(f"  {Colors.DIM}  Public IP: {result.stdout.strip()}{Colors.RESET}")
     
     input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
 def view_logs():
-    print(f"\n{Colors.CYAN}Opening logs (Ctrl+C to exit)...{Colors.RESET}\n")
+    """Interactive log viewer"""
+    print(f"\n{Colors.CYAN}{'═' * 55}{Colors.RESET}")
+    print(f"{Colors.BOLD}{Colors.WHITE}  Log Viewer{Colors.RESET}")
+    print(f"{Colors.CYAN}{'═' * 55}{Colors.RESET}\n")
+    
+    print(f"  {Colors.BOLD}Select service:{Colors.RESET}\n")
+    services = {
+        "1": ("All Services", ""),
+        "2": ("Bot", "bot"),
+        "3": ("API", "api"),
+        "4": ("Database", "db"),
+        "5": ("Redis", "redis"),
+        "6": ("Nginx", "nginx"),
+        "0": ("Back", None),
+    }
+    
+    for key, (name, _) in services.items():
+        print(f"  {Colors.BOLD}{Colors.CYAN}[{key}]{Colors.RESET} {name}")
+    
+    choice = input(f"\n{Colors.YELLOW}Select:{Colors.RESET} ").strip()
+    
+    if choice == "0" or choice not in services:
+        return
+    
+    _, service = services[choice]
+    
+    print(f"\n  {Colors.DIM}Press Ctrl+C to exit{Colors.RESET}\n")
     time.sleep(1)
-    subprocess.run(f"cd {INSTALL_DIR} && docker-compose logs -f", shell=True)
+    
+    cmd = f"cd {INSTALL_DIR} && docker-compose logs -f"
+    if service:
+        cmd += f" {service}"
+    
+    try:
+        subprocess.run(cmd, shell=True)
+    except KeyboardInterrupt:
+        print(f"\n{Colors.DIM}Log viewer closed{Colors.RESET}")
 
 def restart_bot():
     print(f"\n{Colors.CYAN}Restarting SpeediT...{Colors.RESET}")
@@ -445,18 +521,36 @@ def start_bot():
     time.sleep(2)
 
 def update_bot():
+    """Update SpeediT to latest version"""
     print(f"\n{Colors.CYAN}{'═' * 55}{Colors.RESET}")
     print(f"{Colors.BOLD}{Colors.WHITE}  Update SpeediT{Colors.RESET}")
     print(f"{Colors.CYAN}{'═' * 55}{Colors.RESET}\n")
     
+    # Check if installed
+    if not os.path.exists(INSTALL_DIR):
+        print(f"{Colors.RED}✗ SpeediT is not installed!{Colors.RESET}")
+        time.sleep(2)
+        return
+    
+    # Get latest version info
+    print(f"  {Colors.DIM}Checking for updates...{Colors.RESET}")
+    result = subprocess.run("curl -s https://api.github.com/repos/SpeedwiT/SpeediTBot/releases/latest 2>/dev/null | grep tag_name | cut -d'\"' -f4", shell=True, capture_output=True, text=True)
+    latest_version = result.stdout.strip() if result.stdout.strip() else "unknown"
+    print(f"  {Colors.BOLD}Latest version:{Colors.RESET} {Colors.CYAN}{latest_version}{Colors.RESET}")
+    print(f"  {Colors.BOLD}Current version:{Colors.RESET} {Colors.CYAN}{PROJECT_VERSION}{Colors.RESET}\n")
+    
+    # Pull changes
     run_cmd(f"cd {INSTALL_DIR} && git pull 2>/dev/null || echo 'Not a git repo'", "Pulling latest changes")
-    run_cmd(f"cd {INSTALL_DIR} && docker-compose build --no-cache", "Rebuilding images")
+    
+    # Rebuild and restart
+    run_cmd(f"cd {INSTALL_DIR} && docker-compose build --no-cache", "Rebuilding images", timeout=300)
     run_cmd(f"cd {INSTALL_DIR} && docker-compose up -d", "Restarting services")
     
     print(f"\n{Colors.GREEN}{Colors.BOLD}✓ Update complete!{Colors.RESET}")
     time.sleep(2)
 
 def backup():
+    """Create backup"""
     print(f"\n{Colors.CYAN}Creating backup...{Colors.RESET}\n")
     backup_dir = f"{INSTALL_DIR}/backups"
     os.makedirs(backup_dir, exist_ok=True)
@@ -466,6 +560,7 @@ def backup():
     time.sleep(2)
 
 def restore():
+    """Restore from backup"""
     backup_dir = f"{INSTALL_DIR}/backups"
     if not os.path.exists(backup_dir):
         print(f"\n{Colors.RED}No backups found{Colors.RESET}")
@@ -517,6 +612,7 @@ def uninstall():
         time.sleep(2)
 
 def manage():
+    """Management menu"""
     while True:
         clear_screen()
         print_header()

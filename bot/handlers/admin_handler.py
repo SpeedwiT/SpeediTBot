@@ -6,7 +6,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
-from config.settings import settings
+from config import settings
 from database.db import get_session
 from database.models import (
     User, Product, Category, Panel, BankCard, Order,

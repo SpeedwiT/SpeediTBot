@@ -4,7 +4,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, CallbackQueryHandler, MessageHandler, filters, ConversationHandler
 from telegram.constants import ParseMode
 
-from config.settings import settings
+from config import settings
 from database.db import get_session
 from bot.utils.button_customizer import (
     ButtonCustomizer, ButtonConfig, ButtonColor, ButtonStyle,

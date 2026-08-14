@@ -5,7 +5,7 @@ from collections import defaultdict
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from config.settings import settings
+from config import settings
 
 
 # Rate limiting storage
