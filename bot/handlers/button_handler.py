@@ -1,7 +1,7 @@
 """بخش شخصی‌سازی دکمه‌ها در پنل ادمین"""
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes, CallbackQueryHandler, MessageHandler, filters, ConversationHandler
+from telegram.ext import ContextTypes, CallbackQueryHandler, MessageHandler, filters, ConversationHandler, CommandHandler
 from telegram.constants import ParseMode
 
 from config import settings
@@ -359,6 +359,13 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await change_color_done(update, context)
 
 
+async def _cancel_fallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Cancel fallback for conversation handler"""
+    if update.message:
+        await update.message.reply_text("❌ Operation cancelled.")
+    return ConversationHandler.END
+
+
 def get_conversation_handler() -> ConversationHandler:
     """ایجاد ConversationHandler برای شخصی‌سازی دکمه‌ها"""
     return ConversationHandler(
@@ -369,5 +376,5 @@ def get_conversation_handler() -> ConversationHandler:
             CHANGE_EMOJI: [MessageHandler(filters.TEXT & ~filters.COMMAND, change_emoji_done)],
             CHANGE_TEXT: [MessageHandler(filters.TEXT & ~filters.COMMAND, change_text_done)],
         },
-        fallbacks=[CommandHandler("cancel", lambda u, c: ConversationHandler.END)],
+        fallbacks=[MessageHandler(filters.Regex('^(?i)/cancel$'), _cancel_fallback)],
     )
