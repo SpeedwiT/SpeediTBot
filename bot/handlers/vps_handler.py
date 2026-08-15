@@ -17,7 +17,7 @@ from bot.utils.helpers import format_price
 (SPECIFY_SERVER, ENTER_CREDS) = range(2)
 
 
-async def get_conversation_handler() -> ConversationHandler:
+def get_conversation_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CallbackQueryHandler(vps_order_start, pattern="^user_buy_vps$")],
         states={

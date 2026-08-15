@@ -16,7 +16,7 @@ from bot.utils.helpers import format_price
 (NAME, HOST, PORT, USERNAME, PASSWORD, API_TOKEN) = range(6)
 
 
-async def get_conversation_handler() -> ConversationHandler:
+def get_conversation_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CallbackQueryHandler(add_panel_start, pattern="^admin_add_panel$")],
         states={

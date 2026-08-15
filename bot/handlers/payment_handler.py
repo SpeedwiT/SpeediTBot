@@ -21,7 +21,7 @@ from bot.utils.bank_image import generate_card_image
 (SELECT_CARD, ENTER_AMOUNT, UPLOAD_RECEIPT, VERIFY_CODE) = range(4)
 
 
-async def get_conversation_handler() -> ConversationHandler:
+def get_conversation_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[
             CallbackQueryHandler(select_card_start, pattern="^pay_select_card$"),

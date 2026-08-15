@@ -16,7 +16,7 @@ from bot.utils.helpers import format_price
 (NAME, PRICE, DURATION, TRAFFIC, CONNECTIONS, PANEL_TYPE, CATEGORY) = range(7)
 
 
-async def get_conversation_handler() -> ConversationHandler:
+def get_conversation_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CallbackQueryHandler(add_product_start, pattern="^admin_add_product$")],
         states={
